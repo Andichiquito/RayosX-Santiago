@@ -100,19 +100,12 @@ export const userService = {
     const users = await this.getAll();
     const cleanUser = username.trim().toLowerCase();
     
-    // Also sync localStorage if admin has old password
-    const local = getLocalData<User[]>(STORAGE_KEY, INITIAL_USERS);
-    const adminUser = local.find(u => u.username === 'admin');
-    if (adminUser && adminUser.password_hash !== '8014110') {
-      adminUser.password_hash = '8014110';
-      setLocalData(STORAGE_KEY, local);
-    }
-
     const found = users.find(u => 
       u.username.toLowerCase() === cleanUser && 
-      (u.password_hash === password || (cleanUser === 'admin' && password === '8014110') || (cleanUser === 'encargado' && password === '1234')) &&
+      u.password_hash === password &&
       u.activo !== false
     );
     return found || null;
   }
 };
+

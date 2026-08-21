@@ -15,7 +15,6 @@ interface ReportsViewProps {
   patients: Patient[];
   items: Item[];
 }
-//que yico 
 
 export const ReportsView: React.FC<ReportsViewProps> = ({ patients, items }) => {
   // Current month key (YYYY-MM)
