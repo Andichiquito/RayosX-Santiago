@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import type { Patient } from '../types';
-import { 
-  Calendar, 
-  Layers, 
-  Users, 
-  Printer, 
+import type { Item, Patient } from '../types';
+import {
+  Calendar,
+  Layers,
+  Users,
+  Printer,
   TrendingUp,
   FileSpreadsheet,
   Download
@@ -15,6 +15,7 @@ interface ReportsViewProps {
   patients: Patient[];
   items: Item[];
 }
+//que yico 
 
 export const ReportsView: React.FC<ReportsViewProps> = ({ patients, items }) => {
   // Current month key (YYYY-MM)
@@ -109,7 +110,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ patients, items }) => 
       'Placa (Marca - Medida)': item.medida,
       'Cantidad Utilizada': item.cantidad
     }));
-    
+
     summaryData.push({
       'Placa (Marca - Medida)': 'TOTAL GENERAL',
       'Cantidad Utilizada': plateStats.totalPlates
@@ -269,9 +270,9 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ patients, items }) => 
                 filteredPatients.map((patient, idx) => {
                   const fechaStr = patient.fecha_registro
                     ? new Date(patient.fecha_registro).toLocaleString('es-ES', {
-                        day: '2-digit', month: '2-digit', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit'
-                      })
+                      day: '2-digit', month: '2-digit', year: 'numeric',
+                      hour: '2-digit', minute: '2-digit'
+                    })
                     : '—';
 
                   let placasText = '';
