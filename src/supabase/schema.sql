@@ -73,3 +73,5 @@ VALUES
     ('encargado', '1234', 'Encargado de Turno', 'encargado')
 ON CONFLICT (username) DO UPDATE 
 SET nombre_completo = EXCLUDED.nombre_completo, rol = EXCLUDED.rol;
+
+

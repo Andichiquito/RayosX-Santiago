@@ -6,9 +6,16 @@ import { itemService } from './itemService';
 const STORAGE_KEY = 'pacientes';
 
 export const formatPlatesSummary = (details: PlateDetail[]): string => {
-  if (!details || details.length === 0) return 'Sin placas registradas';
+  if (!details || details.length === 0) return 'Sin registros';
   return details
-    .map(p => `${p.cantidad} ${p.cantidad === 1 ? 'placa' : 'placas'} ${p.tipo.replace('x', '×')}`)
+    .map(p => {
+      const label = p.tipo.replace(/x/g, '×');
+      const hasDimension = /\d+\s*×\s*\d+/.test(label);
+      if (hasDimension) {
+        return `${p.cantidad} ${p.cantidad === 1 ? 'placa' : 'placas'} ${label}`;
+      }
+      return `${p.cantidad} ${label}`;
+    })
     .join(', ');
 };
 

@@ -3,7 +3,7 @@ import type { Patient, Item, User, PlateDetail } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { X, Plus, Trash2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { sanitizePersonName, sanitizeText, sanitizeDimension } from '../utils/security';
+import { sanitizePersonName, sanitizeStudyText, sanitizeDimension } from '../utils/security';
 
 interface PatientModalProps {
   isOpen: boolean;
@@ -45,7 +45,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
       value: `${i.nombre} - ${i.dimension!}`,
       dimension: i.dimension!,
       marca: i.nombre,
-      label: `${i.nombre} - ${i.dimension!.replace('x', '×')}`
+      label: `${i.nombre} - ${i.dimension!.replace(/x/g, '×')}`
     }))
     .sort((a, b) => a.marca.localeCompare(b.marca) || a.dimension.localeCompare(b.dimension));
 
@@ -90,17 +90,31 @@ export const PatientModal: React.FC<PatientModalProps> = ({
   };
 
   const handleEstudioChange = (val: string) => {
-    setEstudio(sanitizeText(val, 100));
+    // Permite texto libre, espacios y signos médicos pero bloquea números
+    setEstudio(sanitizeStudyText(val, 100));
     setError(null);
   };
 
   const handlePlateChange = (index: number, field: keyof PlateDetail, value: any) => {
     const updated = [...plates];
-    updated[index] = {
-      ...updated[index],
-      [field]: field === 'cantidad' ? Math.max(1, Math.min(999, parseInt(value, 10) || 1)) : value
-    };
+    if (field === 'cantidad') {
+      if (value === '') {
+        updated[index] = { ...updated[index], cantidad: '' as any };
+      } else {
+        const parsed = parseInt(value, 10);
+        updated[index] = {
+          ...updated[index],
+          cantidad: isNaN(parsed) ? ('' as any) : parsed
+        };
+      }
+    } else {
+      updated[index] = {
+        ...updated[index],
+        [field]: value
+      };
+    }
     setPlates(updated);
+    setError(null);
   };
 
   const handleAddPlateRow = () => {
@@ -117,7 +131,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanNombre = sanitizePersonName(nombrePaciente.trim(), 100);
-    const cleanEstudio = sanitizeText(estudio.trim(), 100);
+    const cleanEstudio = sanitizeStudyText(estudio.trim(), 100).trim();
     const cleanMedico = sanitizePersonName(medico.trim(), 100);
 
     if (!cleanNombre) {
@@ -125,7 +139,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
       return;
     }
     if (!cleanEstudio) {
-      setError('Por favor ingresa el estudio realizado');
+      setError('Por favor ingresa el estudio realizado (no se permiten números)');
       return;
     }
     if (!cleanMedico) {
@@ -138,6 +152,11 @@ export const PatientModal: React.FC<PatientModalProps> = ({
         setError('Por favor define la placa utilizada');
         return;
       }
+      const qty = Number(plate.cantidad);
+      if (isNaN(qty) || qty <= 0) {
+        setError('La cantidad de placas es inválida. Debe ser un número mayor a 0 (el valor 0 no es válido).');
+        return;
+      }
     }
 
     try {
@@ -148,7 +167,8 @@ export const PatientModal: React.FC<PatientModalProps> = ({
         const matched = plateOptions.find(opt => opt.value === p.tipo || opt.dimension === p.tipo);
         return {
           ...p,
-          tipo: matched ? `${matched.marca} - ${matched.dimension}` : sanitizeDimension(p.tipo, 30)
+          tipo: matched ? `${matched.marca} - ${matched.dimension}` : sanitizeDimension(p.tipo, 30),
+          cantidad: Math.max(1, Math.min(999, Number(p.cantidad) || 1))
         };
       });
 
@@ -333,7 +353,8 @@ export const PatientModal: React.FC<PatientModalProps> = ({
                         min="1"
                         max="999"
                         className="custom-input"
-                        value={plate.cantidad}
+                        placeholder="1"
+                        value={plate.cantidad === ('' as any) ? '' : plate.cantidad}
                         onChange={(e) => handlePlateChange(index, 'cantidad', e.target.value)}
                         required
                       />

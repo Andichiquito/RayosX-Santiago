@@ -34,24 +34,26 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
   const [itemToEdit, setItemToEdit] = useState<Item | null>(null);
   const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
 
-  // Form states (Marca, Tamaño, Cantidad)
+  // Form states (Nombre/Marca, Tamaño, Cantidad)
   const [tipo, setTipo] = useState<ItemType>('placa');
   const [autoCode, setAutoCode] = useState('PLC-001');
   const [marca, setMarca] = useState('');
   const [dimension, setDimension] = useState('');
-  const [cantidad, setCantidad] = useState(50);
+  const [cantidad, setCantidad] = useState<number | string>(50);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchNextCode = async (selectedTipo: ItemType) => {
     const code = await itemService.getNextCode(selectedTipo);
     setAutoCode(code);
+    return code;
   };
 
-  const openCreateModal = async () => {
+  const openCreateModal = async (targetTipo?: ItemType) => {
     setItemToEdit(null);
-    setTipo('placa');
-    await fetchNextCode('placa');
+    const chosenTipo = targetTipo || (filterType === 'otro' ? 'otro' : 'placa');
+    setTipo(chosenTipo);
+    await fetchNextCode(chosenTipo);
     setMarca('');
     setDimension('');
     setCantidad(50);
@@ -75,8 +77,6 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
     setTipo(newTipo);
     if (!itemToEdit) {
       await fetchNextCode(newTipo);
-      setMarca('');
-      setDimension('');
     }
   };
 
@@ -87,12 +87,12 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
     const cleanCantidad = Math.max(0, Math.min(99999, Number(cantidad) || 0));
 
     if (!cleanMarca) {
-      setError(tipo === 'placa' ? 'Por favor ingresa la marca de la placa' : 'Por favor ingresa la marca del item');
+      setError(tipo === 'placa' ? 'Por favor ingresa la marca de la placa' : 'Por favor ingresa el nombre del insumo o item');
       return;
     }
 
     if (tipo === 'placa' && !cleanDim) {
-      setError('Por favor ingresa el tamaño de la placa');
+      setError('Por favor ingresa el tamaño o medida de la placa (ej: 20x25, 35x43)');
       return;
     }
 
@@ -161,14 +161,14 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
       <div className="table-top-bar">
         <div className="table-title-area">
           <h1 className="page-main-heading">Inventario General</h1>
-          <p className="page-sub-heading">Control de placas radiológicas y otros insumos</p>
+          <p className="page-sub-heading">Control de placas radiológicas, insumos y materiales</p>
         </div>
 
         <div className="table-top-actions">
           <button
             type="button"
             className="btn-nuevo-paciente"
-            onClick={openCreateModal}
+            onClick={() => openCreateModal()}
           >
             <Plus size={18} />
             <span>Nuevo Registro +</span>
@@ -178,10 +178,10 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
 
       {/* Category Tabs & Search Bar */}
       <div className="filters-card flex flex-col md:flex-row gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           <button
             type="button"
-            className={`nav-tab-btn text-xs py-1.5 px-3 rounded-lg ${filterType === 'ALL' ? 'active' : 'bg-gray-100'}`}
+            className={`nav-tab-btn text-xs py-1.5 px-3 rounded-lg flex items-center gap-1.5 ${filterType === 'ALL' ? 'active' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
             onClick={() => setFilterType('ALL')}
           >
             <Boxes size={14} />
@@ -189,7 +189,7 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
           </button>
           <button
             type="button"
-            className={`nav-tab-btn text-xs py-1.5 px-3 rounded-lg ${filterType === 'placa' ? 'active' : 'bg-gray-100'}`}
+            className={`nav-tab-btn text-xs py-1.5 px-3 rounded-lg flex items-center gap-1.5 ${filterType === 'placa' ? 'active' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
             onClick={() => setFilterType('placa')}
           >
             <Layers size={14} />
@@ -197,7 +197,7 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
           </button>
           <button
             type="button"
-            className={`nav-tab-btn text-xs py-1.5 px-3 rounded-lg ${filterType === 'otro' ? 'active' : 'bg-gray-100'}`}
+            className={`nav-tab-btn text-xs py-1.5 px-3 rounded-lg flex items-center gap-1.5 ${filterType === 'otro' ? 'active' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
             onClick={() => setFilterType('otro')}
           >
             <Package size={14} />
@@ -205,12 +205,12 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
           </button>
         </div>
 
-        <div className="search-input-box flex-1">
+        <div className="search-input-box flex-1 w-full">
           <Search size={18} className="search-icon" />
           <input
             type="text"
             className="filter-search-input"
-            placeholder="Buscar por ID, marca o tamaño..."
+            placeholder="Buscar por código, nombre, marca o medida..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -227,21 +227,26 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
         <table className="custom-medical-table">
           <thead>
             <tr>
-              <th style={{ width: '120px' }}>ID</th>
-              <th style={{ width: '140px' }}>Categoría</th>
-              <th>Marca</th>
-              <th style={{ width: '150px' }}>Tamaño</th>
-              <th style={{ width: '220px' }}>Cantidad</th>
-              <th style={{ width: '120px' }} className="text-center">Acciones</th>
+              <th style={{ width: '100px' }}>Código</th>
+              <th style={{ width: '130px' }}>Categoría</th>
+              <th>Nombre / Marca</th>
+              <th style={{ width: '130px' }}>Medida</th>
+              <th style={{ width: '220px' }}>Existencias</th>
+              <th style={{ width: '110px' }} className="text-center">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {filteredItems.length === 0 ? (
               <tr>
                 <td colSpan={6} className="empty-table-cell">
-                  <div className="empty-state">
-                    <Package size={36} className="text-blue-700 opacity-50" />
-                    <p>No se encontraron registros en el inventario.</p>
+                  <div className="empty-state py-8">
+                    <Package size={40} className="text-blue-700 opacity-40 mx-auto mb-2" />
+                    <p className="font-semibold text-gray-700">No se encontraron registros en el inventario.</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {filterType === 'otro'
+                        ? 'Crea tu primer insumo o material con el botón "Nuevo Registro +".'
+                        : 'Puedes agregar placas o insumos con el botón "Nuevo Registro +".'}
+                    </p>
                   </div>
                 </td>
               </tr>
@@ -261,7 +266,7 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
                       ) : (
                         <span className="role-pill small bg-purple-100 text-purple-800 border border-purple-200">
                           <Package size={12} />
-                          <span>ITEM</span>
+                          <span>INSUMO</span>
                         </span>
                       )}
                     </td>
@@ -270,9 +275,9 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
                     </td>
                     <td>
                       {item.dimension ? (
-                        <span className="dimension-badge">{item.dimension.replace('x', '×')}</span>
+                        <span className="dimension-badge">{item.dimension.replace(/x/g, '×')}</span>
                       ) : (
-                        <span className="text-gray-400 text-sm italic">-</span>
+                        <span className="text-gray-400 text-sm italic">—</span>
                       )}
                     </td>
                     <td>
@@ -338,6 +343,11 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
         </table>
       </div>
 
+      {/* Table Footer */}
+      <div className="table-footer-info">
+        <span>Mostrando <strong>{filteredItems.length}</strong> de <strong>{items.length}</strong> artículos</span>
+      </div>
+
       {/* Modal to Create/Edit Item */}
       {isModalOpen && (
         <div className="modal-backdrop">
@@ -346,21 +356,27 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
               type="button"
               className="modal-close-btn"
               onClick={() => setIsModalOpen(false)}
+              aria-label="Cerrar"
             >
               <X size={20} />
             </button>
 
             <div className="modal-header-section">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-2">
                 <h2 className="modal-title-teal">
                   {itemToEdit 
-                    ? (tipo === 'placa' ? 'Editar Placa' : 'Editar Item')
-                    : (tipo === 'placa' ? 'Nueva Placa' : 'Nuevo Item')}
+                    ? (tipo === 'placa' ? 'Editar Placa' : 'Editar Insumo')
+                    : (tipo === 'placa' ? 'Nueva Placa' : 'Nuevo Insumo / Material')}
                 </h2>
                 <span className="font-mono text-xs bg-blue-50 text-blue-900 border border-blue-200 px-2.5 py-1 rounded-full font-bold">
-                  ID: {autoCode} (Auto)
+                  Código: {autoCode}
                 </span>
               </div>
+              <p className="modal-desc-gray mt-1">
+                {tipo === 'placa' 
+                  ? 'Registra placas radiográficas con su marca y dimensiones.' 
+                  : 'Registra insumos, materiales y accesorios hospitalarios.'}
+              </p>
             </div>
 
             {/* Type Switcher Selector */}
@@ -374,7 +390,8 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
                 >
                   <Layers size={20} color="#003b95" />
                   <div>
-                    <span className="font-bold block">Placa Radiográfica</span>
+                    <span className="font-bold block text-sm">Placa Radiográfica</span>
+                    <span className="text-xs text-gray-500">Ej: 20×25, 35×43</span>
                   </div>
                 </button>
 
@@ -385,7 +402,8 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
                 >
                   <Package size={20} color="#7c3aed" />
                   <div>
-                    <span className="font-bold block">Otro Insumo</span>
+                    <span className="font-bold block text-sm">Otro Insumo</span>
+                    <span className="text-xs text-gray-500">Líquidos, gel, sobres...</span>
                   </div>
                 </button>
               </div>
@@ -398,15 +416,15 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
             )}
 
             <form onSubmit={handleSaveItem} className="patient-form-layout">
-              {/* 1. Marca */}
+              {/* 1. Nombre / Marca */}
               <div className="form-group">
                 <label className="form-label">
-                  {tipo === 'placa' ? 'Marca de la Placa *' : 'Marca del Item *'}
+                  {tipo === 'placa' ? 'Marca de la Placa *' : 'Nombre o Descripción del Insumo *'}
                 </label>
                 <input
                   type="text"
                   className="custom-input"
-                  placeholder={tipo === 'placa' ? 'Marca de la placa' : 'Marca del item'}
+                  placeholder={tipo === 'placa' ? 'Ej: Carestream, Kodak, Agfa...' : 'Ej: Líquido Revelador, Gel Conductor, Guantes...'}
                   value={marca}
                   onChange={(e) => setMarca(sanitizeText(e.target.value, 100))}
                   maxLength={100}
@@ -415,14 +433,14 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
                 />
               </div>
 
-              {/* 2. Tamaño (Only for Placa) */}
+              {/* 2. Tamaño / Medida (Only for Placa) */}
               {tipo === 'placa' && (
                 <div className="form-group">
-                  <label className="form-label">Tamaño de la Placa *</label>
+                  <label className="form-label">Tamaño / Medida de la Placa *</label>
                   <input
                     type="text"
                     className="custom-input"
-                    placeholder="Medida"
+                    placeholder="Ej: 20x25, 35x43, 10x15"
                     value={dimension}
                     onChange={(e) => setDimension(sanitizeDimension(e.target.value, 30))}
                     maxLength={30}
@@ -433,15 +451,22 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
 
               {/* 3. Cantidad */}
               <div className="form-group">
-                <label className="form-label">Cantidad *</label>
+                <label className="form-label">Cantidad / Existencias *</label>
                 <input
                   type="number"
                   min="0"
                   max="99999"
                   className="custom-input"
-                  placeholder="Cantidad"
-                  value={cantidad}
-                  onChange={(e) => setCantidad(Math.max(0, Math.min(99999, parseInt(e.target.value, 10) || 0)))}
+                  placeholder="50"
+                  value={cantidad === '' ? '' : cantidad}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === '') {
+                      setCantidad('');
+                    } else {
+                      setCantidad(Math.max(0, Math.min(99999, parseInt(v, 10) || 0)));
+                    }
+                  }}
                   required
                 />
               </div>
@@ -471,7 +496,7 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
             </div>
             <h3 className="modal-confirm-title">¿Eliminar del inventario?</h3>
             <p className="modal-confirm-text">
-              ¿Estás seguro de eliminar <strong>{itemToDelete.nombre}</strong> (ID: {itemToDelete.codigo})?
+              ¿Estás seguro de eliminar <strong>{itemToDelete.nombre}</strong> (Código: {itemToDelete.codigo})?
             </p>
             <div className="modal-confirm-actions">
               <button 
@@ -495,3 +520,4 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
     </div>
   );
 };
+
