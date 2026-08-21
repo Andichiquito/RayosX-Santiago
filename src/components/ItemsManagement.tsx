@@ -240,7 +240,7 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
               <tr>
                 <td colSpan={6} className="empty-table-cell">
                   <div className="empty-state">
-                    <Package size={36} className="text-teal-600 opacity-60" />
+                    <Package size={36} className="text-blue-700 opacity-50" />
                     <p>No se encontraron registros en el inventario.</p>
                   </div>
                 </td>
@@ -251,7 +251,7 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
 
                 return (
                   <tr key={item.id} className="patient-row">
-                    <td className="font-mono text-sm font-bold text-teal-800">{item.codigo}</td>
+                    <td className="font-mono text-sm font-bold text-blue-900">{item.codigo}</td>
                     <td>
                       {isPlaca ? (
                         <span className="role-pill small role-medico">
@@ -357,7 +357,7 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
                     ? (tipo === 'placa' ? 'Editar Placa' : 'Editar Item')
                     : (tipo === 'placa' ? 'Nueva Placa' : 'Nuevo Item')}
                 </h2>
-                <span className="font-mono text-xs bg-teal-50 text-teal-800 border border-teal-200 px-2.5 py-1 rounded-full font-bold">
+                <span className="font-mono text-xs bg-blue-50 text-blue-900 border border-blue-200 px-2.5 py-1 rounded-full font-bold">
                   ID: {autoCode} (Auto)
                 </span>
               </div>
@@ -369,10 +369,10 @@ export const ItemsManagement: React.FC<ItemsManagementProps> = ({
               <div className="quick-buttons-grid">
                 <button
                   type="button"
-                  className={`quick-btn ${tipo === 'placa' ? 'border-teal-600 bg-teal-50 text-teal-900 shadow-sm' : ''}`}
+                  className={`quick-btn ${tipo === 'placa' ? 'border-blue-600 bg-blue-50 text-blue-950 shadow-sm' : ''}`}
                   onClick={() => handleTipoChange('placa')}
                 >
-                  <Layers size={20} color="#008289" />
+                  <Layers size={20} color="#003b95" />
                   <div>
                     <span className="font-bold block">Placa Radiográfica</span>
                   </div>

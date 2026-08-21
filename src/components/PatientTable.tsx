@@ -5,7 +5,6 @@ import {
   Search,
   Pencil,
   X,
-  Filter,
   Trash2
 } from 'lucide-react';
 
@@ -26,32 +25,19 @@ export const PatientTable: React.FC<PatientTableProps> = ({
 }) => {
   const { isAdmin } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDoctor, setSelectedDoctor] = useState('ALL');
   const [patientToDelete, setPatientToDelete] = useState<Patient | null>(null);
-
-  // Extract unique doctors for filtering
-  const uniqueDoctors = useMemo(() => {
-    const doctors = new Set<string>();
-    patients.forEach(p => {
-      if (p.medico) doctors.add(p.medico);
-    });
-    return Array.from(doctors);
-  }, [patients]);
 
   // Filtered patients
   const filteredPatients = useMemo(() => {
-    return patients.filter(p => {
-      const matchSearch =
-        p.nombre_paciente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.codigo_paciente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.estudio.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.medico.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.placas_utilizadas.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchDoc = selectedDoctor === 'ALL' || p.medico === selectedDoctor;
-      return matchSearch && matchDoc;
-    });
-  }, [patients, searchTerm, selectedDoctor]);
+    if (!searchTerm) return patients;
+    const term = searchTerm.toLowerCase();
+    return patients.filter(p =>
+      p.nombre_paciente.toLowerCase().includes(term) ||
+      p.codigo_paciente.toLowerCase().includes(term) ||
+      p.estudio.toLowerCase().includes(term) ||
+      p.medico.toLowerCase().includes(term)
+    );
+  }, [patients, searchTerm]);
 
   const confirmDelete = async () => {
     if (patientToDelete) {
@@ -66,7 +52,7 @@ export const PatientTable: React.FC<PatientTableProps> = ({
       <div className="table-top-bar">
         <div className="table-title-area">
           <h1 className="page-main-heading">Registro de Pacientes</h1>
-          <p className="page-sub-heading">Control diario de estudios radiológicos y atención médica</p>
+          <p className="page-sub-heading">Control de estudios radiológicos y atención médica</p>
         </div>
 
         <div className="table-top-actions">
@@ -81,9 +67,9 @@ export const PatientTable: React.FC<PatientTableProps> = ({
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
+      {/* Search Bar */}
       <div className="filters-card">
-        <div className="search-input-box">
+        <div className="search-input-box" style={{ flex: 1 }}>
           <Search size={18} className="search-icon" />
           <input
             type="text"
@@ -97,20 +83,6 @@ export const PatientTable: React.FC<PatientTableProps> = ({
               <X size={14} />
             </button>
           )}
-        </div>
-
-        <div className="filter-select-box">
-          <Filter size={16} className="filter-icon" />
-          <select
-            className="custom-select-filter"
-            value={selectedDoctor}
-            onChange={(e) => setSelectedDoctor(e.target.value)}
-          >
-            <option value="ALL">Todos los Médicos ({uniqueDoctors.length})</option>
-            {uniqueDoctors.map(doc => (
-              <option key={doc} value={doc}>{doc}</option>
-            ))}
-          </select>
         </div>
       </div>
 
@@ -141,9 +113,9 @@ export const PatientTable: React.FC<PatientTableProps> = ({
               filteredPatients.map((patient) => {
                 const fechaStr = patient.fecha_registro
                   ? new Date(patient.fecha_registro).toLocaleString('es-ES', {
-                      day: '2-digit', month: '2-digit', year: 'numeric',
-                      hour: '2-digit', minute: '2-digit'
-                    })
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                  })
                   : '—';
                 return (
                   <tr key={patient.id} className="patient-row">

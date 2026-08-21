@@ -79,8 +79,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => onSelectTab('reports')}
             >
               <BarChart3 size={18} />
-              <span>Reporte de Placas</span>
+              <span>Reportes</span>
             </button>
+
           )}
         </nav>
 

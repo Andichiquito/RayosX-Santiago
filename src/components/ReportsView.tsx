@@ -169,10 +169,10 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ patients, items }) => 
 
         <div className="table-top-actions flex flex-wrap gap-2">
           {/* Month Selector */}
-          <div className="filter-select-box bg-white border border-teal-200">
-            <Calendar size={16} className="text-teal-700" />
+          <div className="filter-select-box bg-white border border-slate-200">
+            <Calendar size={16} className="text-blue-700" />
             <select
-              className="custom-select-filter font-semibold text-teal-900"
+              className="custom-select-filter font-semibold text-slate-800"
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
             >
@@ -208,19 +208,19 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ patients, items }) => 
 
       {/* Quick Total KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-        <div className="filters-card flex items-center gap-4 p-4 border-l-4 border-l-teal-600 bg-white">
-          <div className="brand-icon bg-teal-50 text-teal-800 border border-teal-200">
-            <Layers size={24} color="#008289" />
+        <div className="filters-card flex items-center gap-4 p-4 border-l-4 border-l-blue-700 bg-white">
+          <div className="brand-icon bg-blue-50 text-blue-900 border border-blue-200" style={{ width: '48px', height: '48px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Layers size={24} color="#003b95" />
           </div>
           <div>
             <span className="text-xs text-gray-500 font-bold uppercase tracking-wider block">Total Placas Utilizadas</span>
-            <span className="text-3xl font-extrabold text-teal-800 font-mono">{plateStats.totalPlates}</span>
+            <span className="text-3xl font-extrabold text-blue-900 font-mono">{plateStats.totalPlates}</span>
             <span className="text-xs text-gray-400 block mt-0.5">{formatMonthLabel(selectedMonth)}</span>
           </div>
         </div>
 
         <div className="filters-card flex items-center gap-4 p-4 border-l-4 border-l-slate-600 bg-white">
-          <div className="brand-icon bg-slate-50 text-slate-800 border border-slate-200">
+          <div className="brand-icon bg-slate-50 text-slate-800 border border-slate-200" style={{ width: '48px', height: '48px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Users size={24} color="#334155" />
           </div>
           <div>
@@ -233,12 +233,12 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ patients, items }) => 
 
       {/* Main Report Table: Detalle por Paciente */}
       <div className="patient-table-container mt-4">
-        <div className="p-4 bg-teal-50/70 border-b border-teal-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="p-4 bg-blue-50/60 border-b border-blue-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <TrendingUp size={20} color="#008289" />
-            <h2 className="text-base font-bold text-teal-950">Detalle de Estudios ({formatMonthLabel(selectedMonth)})</h2>
+            <TrendingUp size={20} color="#003b95" />
+            <h2 className="text-base font-bold text-slate-900">Detalle de Estudios ({formatMonthLabel(selectedMonth)})</h2>
           </div>
-          <span className="font-mono text-xs font-bold text-teal-900 bg-white px-3 py-1 rounded-full border border-teal-200 shadow-sm self-start sm:self-auto">
+          <span className="font-mono text-xs font-bold text-blue-900 bg-white px-3 py-1 rounded-full border border-blue-200 shadow-sm self-start sm:self-auto">
             {filteredPatients.length} {filteredPatients.length === 1 ? 'estudio registrado' : 'estudios registrados'}
           </span>
         </div>
@@ -261,7 +261,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ patients, items }) => 
                 <tr>
                   <td colSpan={7} className="empty-table-cell">
                     <div className="empty-state">
-                      <FileSpreadsheet size={36} className="text-teal-600 opacity-60" />
+                      <FileSpreadsheet size={36} className="text-blue-700 opacity-50" />
                       <p>No se registraron estudios en este periodo.</p>
                     </div>
                   </td>
@@ -294,7 +294,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ patients, items }) => 
                       <td className="text-sm text-gray-700">{patient.estudio}</td>
                       <td className="text-sm text-gray-700">{patient.medico}</td>
                       <td className="text-sm text-gray-700">{placasText}</td>
-                      <td className="font-mono text-sm font-extrabold text-teal-900 text-center">{totalQty || '—'}</td>
+                      <td className="font-mono text-sm font-extrabold text-blue-900 text-center">{totalQty || '—'}</td>
                     </tr>
                   );
                 })
@@ -302,11 +302,11 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ patients, items }) => 
             </tbody>
             {filteredPatients.length > 0 && (
               <tfoot>
-                <tr className="bg-teal-50/80 font-bold">
-                  <td colSpan={6} className="text-right text-sm text-teal-950 pr-4">
+                <tr className="bg-blue-50/70 font-bold">
+                  <td colSpan={6} className="text-right text-sm text-slate-800 pr-4">
                     TOTAL GENERAL DE PLACAS:
                   </td>
-                  <td className="font-mono text-lg text-teal-900 font-extrabold text-center">
+                  <td className="font-mono text-lg text-blue-900 font-extrabold text-center">
                     {plateStats.totalPlates}
                   </td>
                 </tr>
@@ -343,7 +343,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ patients, items }) => 
                   <td className="font-mono text-xs text-gray-400 font-bold">{idx + 1}</td>
                   <td className="font-semibold text-gray-800 text-sm">{item.medida.replace('x', '×')}</td>
                   <td>
-                    <span className="font-mono text-base font-extrabold text-teal-900">{item.cantidad}</span>
+                    <span className="font-mono text-base font-extrabold text-blue-900">{item.cantidad}</span>
                     <span className="text-xs text-gray-500 ml-1">placas</span>
                   </td>
                 </tr>

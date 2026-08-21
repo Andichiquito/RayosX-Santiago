@@ -187,10 +187,10 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                   <td>
                     <div className="font-semibold text-gray-900 flex items-center gap-2">
                       <span>{u.nombre_completo}</span>
-                      {isMe && <span className="text-xs text-teal-600 font-normal bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">(Tu cuenta)</span>}
+                      {isMe && <span className="text-xs text-blue-700 font-normal bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">(Tu cuenta)</span>}
                     </div>
                   </td>
-                  <td className="font-mono text-sm font-semibold text-teal-800">
+                  <td className="font-mono text-sm font-semibold text-blue-900">
                     @{u.username}
                   </td>
                   <td>
@@ -199,7 +199,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                         className={`custom-select-filter text-xs font-semibold py-1 px-2 rounded-md border ${
                           isAdminRole 
                             ? 'bg-amber-50 text-amber-800 border-amber-300' 
-                            : 'bg-teal-50 text-teal-800 border-teal-300'
+                            : 'bg-blue-50 text-blue-800 border-blue-200'
                         }`}
                         value={u.rol}
                         onChange={(e) => handleQuickRoleChange(u.id, e.target.value as UserRole)}

@@ -37,7 +37,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
   const [estudio, setEstudio] = useState('');
   const [medico, setMedico] = useState('');
   const [codigoPaciente, setCodigoPaciente] = useState('');
-  
+
   // Available plates formatted as "Marca - Medida" and sorted cleanly
   const plateOptions: FormattedPlateOption[] = items
     .filter(i => (i.tipo || (i.dimension ? 'placa' : 'otro')) === 'placa' && i.dimension)
@@ -168,7 +168,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
           spread: 60,
           origin: { y: 0.7 }
         });
-      } catch {}
+      } catch { }
 
       onClose();
     } catch (err: any) {
@@ -181,9 +181,9 @@ export const PatientModal: React.FC<PatientModalProps> = ({
   return (
     <div className="modal-backdrop">
       <div className="modal-card modal-patient-dialog animate-scale-in">
-        <button 
-          type="button" 
-          className="modal-close-btn" 
+        <button
+          type="button"
+          className="modal-close-btn"
           onClick={onClose}
           aria-label="Cerrar"
         >
@@ -244,7 +244,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({
           {/* Doctor / Encargado */}
           <div className="form-group">
             <label className="form-label" htmlFor="patient-doctor">
-              Médico / Encargado *
+              Encargado
             </label>
             {activeStaff.length > 0 ? (
               <div className="select-wrapper">
@@ -364,8 +364,8 @@ export const PatientModal: React.FC<PatientModalProps> = ({
             {isSubmitting
               ? 'Guardando...'
               : patientToEdit
-              ? 'Guardar Cambios'
-              : 'Registrar Paciente'}
+                ? 'Guardar Cambios'
+                : 'Registrar Paciente'}
           </button>
         </form>
       </div>
